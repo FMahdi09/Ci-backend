@@ -1,5 +1,6 @@
 package Ci.Backend.Repositories;
 
+import Ci.Backend.Categories.IntegrationTest;
 import Ci.Backend.Exceptions.RoleNotFoundException;
 import Ci.Backend.Models.Role;
 import org.junit.jupiter.api.AfterEach;
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @DataJpaTest
+@IntegrationTest
 class RoleRepositoryTest
 {
     @Autowired

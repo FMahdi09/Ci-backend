@@ -1,5 +1,6 @@
 package Ci.Backend.Repositories;
 
+import Ci.Backend.Categories.IntegrationTest;
 import Ci.Backend.Models.Role;
 import Ci.Backend.Models.UserEntity;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 @DataJpaTest
+@IntegrationTest
 class UserRepositoryTest
 {
     @Autowired
