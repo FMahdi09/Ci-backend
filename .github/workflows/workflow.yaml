@@ -1,0 +1,39 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    name: Lint
+
+    steps:
+      - name: lint here
+        run: echo "linting . . ."
+
+  test:
+    needs: lint
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        java: [ 22 ]
+
+    name: Run tests on Java ${{ matrix.java }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@master
+
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: run unit tests
+        run: mvn clean test -PUnit
+
+      - name: run integration tests
+        run: mvn clean test -PIntegration
