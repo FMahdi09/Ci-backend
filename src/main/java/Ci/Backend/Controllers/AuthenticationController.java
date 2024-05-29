@@ -82,7 +82,7 @@ public class AuthenticationController
     }
 
     @PostMapping(path = "refresh")
-    public ResponseEntity<AuthenticationResponseDto> register(@CookieValue("refreshToken") String refreshToken)
+    public ResponseEntity<AuthenticationResponseDto> refresh(@CookieValue("refreshToken") String refreshToken)
     {
         try
         {
