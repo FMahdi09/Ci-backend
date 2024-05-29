@@ -4,7 +4,6 @@ import Ci.Backend.Categories.IntegrationTest;
 import Ci.Backend.Models.Role;
 import Ci.Backend.Models.UserEntity;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,6 +15,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @IntegrationTest
@@ -82,10 +83,10 @@ class UserRepositoryTest
         UserEntity user = userRepository.findByUsername(existingUser.getUsername()).orElseThrow();
 
         // assert
-        Assertions.assertAll(
-                () -> Assertions.assertEquals(user.getUsername(), existingUser.getUsername()),
-                () -> Assertions.assertEquals(user.getPassword(), existingUser.getPassword()),
-                () -> Assertions.assertEquals(user.getEmail(), existingUser.getEmail())
+        assertAll(
+                () -> assertEquals(user.getUsername(), existingUser.getUsername()),
+                () -> assertEquals(user.getPassword(), existingUser.getPassword()),
+                () -> assertEquals(user.getEmail(), existingUser.getEmail())
         );
     }
 
@@ -94,7 +95,7 @@ class UserRepositoryTest
     void findByUsername_givenNonExistingUsername_throwUsernameNotFound(String nonExitingUsername)
     {
         // act
-        UsernameNotFoundException exception = Assertions.assertThrows(
+        UsernameNotFoundException exception = assertThrows(
                 UsernameNotFoundException.class,
                 () -> userRepository.findByUsername(nonExitingUsername).orElseThrow(
                         () -> new UsernameNotFoundException(String.format("Username %s not found", nonExitingUsername))
@@ -103,7 +104,7 @@ class UserRepositoryTest
 
         // assert
         String exceptionMessage = exception.getMessage();
-        Assertions.assertTrue(exceptionMessage.contains(nonExitingUsername));
+        assertTrue(exceptionMessage.contains(nonExitingUsername));
     }
 
     @ParameterizedTest
@@ -114,7 +115,7 @@ class UserRepositoryTest
         boolean result = userRepository.existsByUsername(existingUsername);
 
         // assert
-        Assertions.assertTrue(result);
+        assertTrue(result);
     }
 
     @ParameterizedTest
@@ -125,6 +126,6 @@ class UserRepositoryTest
         boolean result = userRepository.existsByUsername(nonExistingUsername);
 
         // assert
-        Assertions.assertFalse(result);
+        assertFalse(result);
     }
 }
