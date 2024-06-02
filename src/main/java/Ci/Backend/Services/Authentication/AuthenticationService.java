@@ -1,8 +1,8 @@
 package Ci.Backend.Services.Authentication;
 
-import Ci.Backend.Dtos.LoginReponseDto;
+import Ci.Backend.Dtos.TokenResponseDto;
 
 public interface AuthenticationService
 {
-    LoginReponseDto login(String username, String password);
+    TokenResponseDto login(String username, String password);
 }

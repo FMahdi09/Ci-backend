@@ -45,7 +45,7 @@ public class AuthenticationController
     {
         loginDto.ensureValidDto();
 
-        LoginReponseDto loginResponse = authenticationService.login(loginDto.getUsername(), loginDto.getPassword());
+        TokenResponseDto loginResponse = authenticationService.login(loginDto.getUsername(), loginDto.getPassword());
 
         Cookie cookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
         cookie.setSecure(true);

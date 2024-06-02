@@ -1,6 +1,6 @@
 package Ci.Backend.Services.Authentication;
 
-import Ci.Backend.Dtos.LoginReponseDto;
+import Ci.Backend.Dtos.TokenResponseDto;
 import Ci.Backend.Services.Token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +26,7 @@ public class DbAuthenticationService implements AuthenticationService
     }
 
     @Override
-    public LoginReponseDto login(String username, String password)
+    public TokenResponseDto login(String username, String password)
     {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -51,6 +51,6 @@ public class DbAuthenticationService implements AuthenticationService
                 refreshExpiration
         );
 
-        return new LoginReponseDto(refreshToken, accessToken);
+        return new TokenResponseDto(refreshToken, accessToken);
     }
 }
