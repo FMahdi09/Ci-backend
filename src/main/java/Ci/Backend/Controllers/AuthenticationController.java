@@ -1,10 +1,8 @@
 package Ci.Backend.Controllers;
 
-import Ci.Backend.Dtos.AuthenticationResponseDto;
-import Ci.Backend.Dtos.InvalidDtoException;
-import Ci.Backend.Dtos.LoginDto;
-import Ci.Backend.Dtos.RegisterDto;
+import Ci.Backend.Dtos.*;
 import Ci.Backend.Models.UserEntity;
+import Ci.Backend.Services.Authentication.AuthenticationService;
 import Ci.Backend.Services.Token.ExpiredTokenException;
 import Ci.Backend.Services.Token.InvalidTokenException;
 import Ci.Backend.Services.Token.TokenService;
@@ -15,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,41 +26,35 @@ public class AuthenticationController
 
     private final TokenService tokenService;
 
+    private final AuthenticationService authenticationService;
+
     @Autowired
     public AuthenticationController(UserService userService,
+                                    AuthenticationService authenticationService,
                                     TokenService tokenGeneratorService)
     {
         this.userService = userService;
+        this.authenticationService = authenticationService;
         this.tokenService = tokenGeneratorService;
     }
 
     @PostMapping(path = "login")
-    public ResponseEntity<AuthenticationResponseDto> login(HttpServletResponse response,
+    public ResponseEntity<AuthenticationResponseDto> login(HttpServletResponse httpResponse,
                                                            @RequestBody LoginDto loginDto)
             throws InvalidDtoException
     {
         loginDto.ensureValidDto();
 
-        Authentication authentication = userService.authenticate(
-                loginDto.getUsername(),
-                loginDto.getPassword()
-        );
+        LoginReponseDto loginResponse = authenticationService.login(loginDto.getUsername(), loginDto.getPassword());
 
-        Date issuedAt = new Date();
-        Date accessExpiration = new Date(issuedAt.getTime() + 70000);
-        Date refreshExpiration = new Date(issuedAt.getTime() + 700000);
-
-        String accessToken = tokenService.generateAccessToken(authentication.getName(), issuedAt, accessExpiration);
-        String refreshToken = tokenService.generateRefreshToken(authentication.getName(), issuedAt, refreshExpiration);
-
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        Cookie cookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
         cookie.setSecure(true);
         cookie.setHttpOnly(true);
-        response.addCookie(cookie);
+        httpResponse.addCookie(cookie);
 
-        AuthenticationResponseDto responseDto = new AuthenticationResponseDto(accessToken);
+        AuthenticationResponseDto reponseDto = new AuthenticationResponseDto(loginResponse.getAccessToken());
 
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return ResponseEntity.ok(reponseDto);
     }
 
     @PostMapping(path = "register")
