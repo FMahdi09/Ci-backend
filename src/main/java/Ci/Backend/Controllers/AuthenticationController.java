@@ -58,20 +58,28 @@ public class AuthenticationController
     }
 
     @PostMapping(path = "register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto)
+    public ResponseEntity<AuthenticationResponseDto> register(HttpServletResponse httpResponse,
+                                                              @RequestBody RegisterDto registerDto)
             throws InvalidDtoException
     {
         try
         {
             registerDto.ensureValidDto();
 
-            userService.createNewUser(
+            TokenResponseDto loginResponse = authenticationService.register(
                     registerDto.getUsername(),
                     registerDto.getPassword(),
                     registerDto.getEmail()
             );
 
-            return new ResponseEntity<>(HttpStatus.OK);
+            Cookie cookie = new Cookie("refreshToken", loginResponse.getRefreshToken());
+            cookie.setSecure(true);
+            cookie.setHttpOnly(true);
+            httpResponse.addCookie(cookie);
+
+            AuthenticationResponseDto reponseDto = new AuthenticationResponseDto(loginResponse.getAccessToken());
+
+            return ResponseEntity.ok(reponseDto);
         }
         catch (UsernameExistsException exception)
         {
