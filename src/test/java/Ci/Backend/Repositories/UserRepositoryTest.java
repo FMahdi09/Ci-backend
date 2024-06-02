@@ -1,7 +1,5 @@
 package Ci.Backend.Repositories;
 
-import Ci.Backend.Categories.IntegrationTest;
-import Ci.Backend.Models.Role;
 import Ci.Backend.Models.UserEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,46 +7,52 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Testcontainers
 @DataJpaTest
-@IntegrationTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest
 {
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:16.0");
+
     @Autowired
     private UserRepository userRepository;
 
     //region <testData>
-    private static final List<Role> userRoles = Collections.singletonList(
-            new Role("USER")
-    );
-
     private static final UserEntity testUser1 = new UserEntity(
             "Tick",
             "Password",
             "Tick@example.com",
-            userRoles
+            new ArrayList<>()
     );
 
     private static final UserEntity testUser2 = new UserEntity(
             "Trick",
             "Password",
             "Trick@example.com",
-            userRoles
+            new ArrayList<>()
     );
 
     private static final UserEntity testUser3 = new UserEntity(
             "Track",
             "Password",
             "Track@example.com",
-            userRoles
+            new ArrayList<>()
     );
 
     private static List<UserEntity> getExisitingUsers()
