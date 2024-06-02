@@ -5,9 +5,6 @@ import Ci.Backend.Models.UserEntity;
 import Ci.Backend.Repositories.RoleRepository;
 import Ci.Backend.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,8 +15,6 @@ import java.util.List;
 @Service
 public class DbUserService implements UserService
 {
-    private final AuthenticationManager authenticationManager;
-
     private final PasswordEncoder passwordEncoder;
 
     private final UserRepository userRepository;
@@ -27,26 +22,13 @@ public class DbUserService implements UserService
     private final RoleRepository roleRepository;
 
     @Autowired
-    public DbUserService(AuthenticationManager authenticationManager,
-                         PasswordEncoder passwordEncoder,
+    public DbUserService(PasswordEncoder passwordEncoder,
                          UserRepository userRepository,
                          RoleRepository roleRepository)
     {
-        this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-    }
-
-    @Override
-    public Authentication authenticate(String username, String password)
-    {
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        username,
-                        password
-                )
-        );
     }
 
     @Override

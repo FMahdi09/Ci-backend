@@ -12,9 +12,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -31,12 +27,6 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class DbUserServiceTest
 {
-    @Mock
-    private AuthenticationManager authenticationManager;
-
-    @Mock
-    private Authentication givenAuthentication;
-
     @Mock
     private PasswordEncoder passwordEncoder;
 
@@ -52,7 +42,6 @@ class DbUserServiceTest
     void setUp()
     {
         userService = new DbUserService(
-                authenticationManager,
                 passwordEncoder,
                 userRepository,
                 roleRepository
@@ -134,23 +123,5 @@ class DbUserServiceTest
 
         // assert
         assertEquals(existingUser, foundUser);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"username,password"})
-    void authenticate_givenCredentials_returnAuthentication(String username, String password)
-    {
-        // arrange
-        given(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .willReturn(givenAuthentication);
-
-        given(givenAuthentication.getName())
-                .willReturn(username);
-
-        // act
-        Authentication authentication = userService.authenticate(username, password);
-
-        // assert
-        assertEquals(username, authentication.getName());
     }
 }
