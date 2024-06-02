@@ -1,6 +1,9 @@
 package Ci.Backend.Services.Authentication;
 
 import Ci.Backend.Dtos.TokenResponseDto;
+import Ci.Backend.Models.UserEntity;
+import Ci.Backend.Services.Token.ExpiredTokenException;
+import Ci.Backend.Services.Token.InvalidTokenException;
 import Ci.Backend.Services.Token.TokenService;
 import Ci.Backend.Services.User.UserService;
 import Ci.Backend.Services.User.UsernameExistsException;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -85,5 +89,19 @@ public class DbAuthenticationService implements AuthenticationService
         return new TokenResponseDto(refreshToken, accessToken);
     }
 
+    @Override
+    public String refresh(String refreshToken)
+            throws InvalidTokenException, ExpiredTokenException, UsernameNotFoundException
+    {
+        String username = tokenService.getUsernameFromRefreshToken(refreshToken);
 
+        UserEntity user = userService.findByUsername(username);
+
+        tokenService.validateRefreshToken(refreshToken, user);
+
+        Date issuedAt = new Date();
+        Date refreshExpiration = new Date(issuedAt.getTime() + 700000);
+
+        return tokenService.generateAccessToken(user.getUsername(), issuedAt, refreshExpiration);
+    }
 }

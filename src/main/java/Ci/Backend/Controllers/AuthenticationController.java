@@ -1,12 +1,9 @@
 package Ci.Backend.Controllers;
 
 import Ci.Backend.Dtos.*;
-import Ci.Backend.Models.UserEntity;
 import Ci.Backend.Services.Authentication.AuthenticationService;
 import Ci.Backend.Services.Token.ExpiredTokenException;
 import Ci.Backend.Services.Token.InvalidTokenException;
-import Ci.Backend.Services.Token.TokenService;
-import Ci.Backend.Services.User.UserService;
 import Ci.Backend.Services.User.UsernameExistsException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,26 +13,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
 @RestController
 @RequestMapping(path = "api/auth")
 public class AuthenticationController
 {
-    private final UserService userService;
-
-    private final TokenService tokenService;
-
     private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthenticationController(UserService userService,
-                                    AuthenticationService authenticationService,
-                                    TokenService tokenGeneratorService)
+    public AuthenticationController(AuthenticationService authenticationService)
     {
-        this.userService = userService;
         this.authenticationService = authenticationService;
-        this.tokenService = tokenGeneratorService;
     }
 
     @PostMapping(path = "login")
@@ -92,24 +79,19 @@ public class AuthenticationController
     {
         try
         {
-            String username = tokenService.getUsernameFromRefreshToken(refreshToken);
-
-            UserEntity user = userService.findByUsername(username);
-
-            tokenService.validateRefreshToken(refreshToken, user);
-
-            Date issuedAt = new Date();
-            Date refreshExpiration = new Date(issuedAt.getTime() + 700000);
-
-            String accessToken = tokenService.generateAccessToken(user.getUsername(), issuedAt, refreshExpiration);
+            String accessToken = authenticationService.refresh(refreshToken);
 
             AuthenticationResponseDto responseDto = new AuthenticationResponseDto(accessToken);
 
-            return new ResponseEntity<>(responseDto, HttpStatus.OK);
+            return ResponseEntity.ok(responseDto);
         }
-        catch (InvalidTokenException | ExpiredTokenException | UsernameNotFoundException exception)
+        catch (ExpiredTokenException exception)
         {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        catch (InvalidTokenException | UsernameNotFoundException exception)
+        {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 }
