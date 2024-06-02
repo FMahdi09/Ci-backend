@@ -51,8 +51,6 @@ Jwt Config:
 
 * ci.accessTokenSecret: secret Key used to sign accessTokens
 * ci.refreshTokenSecret: secret Key used to sign refreshTokens
-* ci.accessTokenExpiration: accessToken validity duration (in ms)
-* ci.refreshTokenExpiration: refreshToken validity duration (in ms)
 
 If you don't want to bother creating the config yourself, you can rename
 
