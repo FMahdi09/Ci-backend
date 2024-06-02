@@ -5,6 +5,7 @@ import Ci.Backend.Dtos.InvalidDtoException;
 import Ci.Backend.Dtos.LoginDto;
 import Ci.Backend.Dtos.RegisterDto;
 import Ci.Backend.Models.UserEntity;
+import Ci.Backend.Services.Token.ExpiredTokenException;
 import Ci.Backend.Services.Token.InvalidTokenException;
 import Ci.Backend.Services.Token.TokenService;
 import Ci.Backend.Services.User.UserService;
@@ -107,7 +108,7 @@ public class AuthenticationController
 
             return new ResponseEntity<>(responseDto, HttpStatus.OK);
         }
-        catch (InvalidTokenException | UsernameNotFoundException exception)
+        catch (InvalidTokenException | ExpiredTokenException | UsernameNotFoundException exception)
         {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }

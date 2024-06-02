@@ -1,10 +1,7 @@
 package Ci.Backend.Services.Token;
 
 import Ci.Backend.Configuration.JwtConfiguration;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,21 +47,21 @@ public class JwtTokenService implements TokenService
 
     @Override
     public String getUsernameFromAccessToken(String token)
-            throws InvalidTokenException
+            throws InvalidTokenException, ExpiredTokenException
     {
         return extractClaim(token, accessTokenKey, Claims::getSubject);
     }
 
     @Override
     public String getUsernameFromRefreshToken(String token)
-            throws InvalidTokenException
+            throws InvalidTokenException, ExpiredTokenException
     {
         return extractClaim(token, refreshTokenKey, Claims::getSubject);
     }
 
     @Override
     public void validateAccessToken(String token, UserDetails userDetails)
-            throws InvalidTokenException
+            throws InvalidTokenException, ExpiredTokenException
     {
         String username = getUsernameFromAccessToken(token);
 
@@ -76,7 +73,7 @@ public class JwtTokenService implements TokenService
 
     @Override
     public void validateRefreshToken(String token, UserDetails userDetails)
-            throws InvalidTokenException
+            throws InvalidTokenException, ExpiredTokenException
     {
         String username = getUsernameFromRefreshToken(token);
 
@@ -87,14 +84,14 @@ public class JwtTokenService implements TokenService
     }
 
     private <T> T extractClaim(String token, Key key, Function<Claims, T> claimsResolver)
-            throws InvalidTokenException
+            throws InvalidTokenException, ExpiredTokenException
     {
         final Claims claims = extractAllClaims(token, key);
         return claimsResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token, Key key)
-            throws InvalidTokenException
+            throws InvalidTokenException, ExpiredTokenException
     {
         try
         {
@@ -105,9 +102,13 @@ public class JwtTokenService implements TokenService
                     .parseClaimsJws(token)
                     .getBody();
         }
+        catch (ExpiredJwtException ex)
+        {
+            throw new ExpiredTokenException("expired token provided");
+        }
         catch (JwtException ex)
         {
-            throw new InvalidTokenException("Invalid or expired token provided");
+            throw new InvalidTokenException("Invalid token provided");
         }
     }
 

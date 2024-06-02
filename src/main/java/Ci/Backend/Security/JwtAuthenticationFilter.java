@@ -1,5 +1,6 @@
 package Ci.Backend.Security;
 
+import Ci.Backend.Services.Token.ExpiredTokenException;
 import Ci.Backend.Services.Token.InvalidTokenException;
 import Ci.Backend.Services.Token.TokenService;
 import jakarta.servlet.FilterChain;
@@ -65,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
 
             filterChain.doFilter(request, response);
         }
-        catch (InvalidTokenException ex)
+        catch (InvalidTokenException | ExpiredTokenException ex)
         {
             filterChain.doFilter(request, response);
         }

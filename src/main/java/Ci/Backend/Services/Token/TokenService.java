@@ -11,14 +11,14 @@ public interface TokenService
     String generateRefreshToken(String subject, Date issuedAt, Date expiresAt);
 
     String getUsernameFromAccessToken(String token)
-            throws InvalidTokenException;
+            throws InvalidTokenException, ExpiredTokenException;
 
     String getUsernameFromRefreshToken(String token)
-            throws InvalidTokenException;
+            throws InvalidTokenException, ExpiredTokenException;
 
     void validateAccessToken(String token, UserDetails userDetails)
-            throws InvalidTokenException;
+            throws InvalidTokenException, ExpiredTokenException;
 
     void validateRefreshToken(String token, UserDetails userDetails)
-            throws InvalidTokenException;
+            throws InvalidTokenException, ExpiredTokenException;
 }
