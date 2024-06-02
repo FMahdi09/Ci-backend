@@ -2,11 +2,13 @@ package Ci.Backend.Services.Token;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Date;
+
 public interface TokenService
 {
-    String generateAccessToken(String username);
+    String generateAccessToken(String subject, Date issuedAt, Date expiresAt);
 
-    String generateRefreshToken(String username);
+    String generateRefreshToken(String subject, Date issuedAt, Date expiresAt);
 
     String getUsernameFromAccessToken(String token)
             throws InvalidTokenException;

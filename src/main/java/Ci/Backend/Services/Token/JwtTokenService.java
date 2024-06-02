@@ -20,27 +20,32 @@ public class JwtTokenService implements TokenService
     private final Key accessTokenKey;
     private final Key refreshTokenKey;
 
-    private final int accessTokenExpiration;
-    private final int refreshTokenExpiration;
-
     public JwtTokenService(JwtConfiguration configuration)
     {
         accessTokenKey = getSigningKey(configuration.getAccessTokenSecret());
         refreshTokenKey = getSigningKey(configuration.getRefreshTokenSecret());
-        accessTokenExpiration = configuration.getAccessTokenExpiration();
-        refreshTokenExpiration = configuration.getRefreshTokenExpiration();
     }
 
     @Override
-    public String generateAccessToken(String username)
+    public String generateAccessToken(String subject, Date issuedAt, Date expiresAt)
     {
-        return generateToken(username, accessTokenExpiration, accessTokenKey);
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiresAt)
+                .signWith(accessTokenKey, SignatureAlgorithm.HS512)
+                .compact();
     }
 
     @Override
-    public String generateRefreshToken(String username)
+    public String generateRefreshToken(String subject, Date issuedAt, Date expiresAt)
     {
-        return generateToken(username, refreshTokenExpiration, refreshTokenKey);
+        return Jwts.builder()
+                .setSubject(subject)
+                .setIssuedAt(issuedAt)
+                .setExpiration(expiresAt)
+                .signWith(refreshTokenKey, SignatureAlgorithm.HS512)
+                .compact();
     }
 
     @Override
@@ -79,19 +84,6 @@ public class JwtTokenService implements TokenService
         {
             throw new InvalidTokenException("refresh token does not match provided UserDetails");
         }
-    }
-
-    private String generateToken(String username, int expiresIn, Key key)
-    {
-        Date issuedAt = new Date();
-        Date expiresAt = new Date(issuedAt.getTime() + expiresIn);
-
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(issuedAt)
-                .setExpiration(expiresAt)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .compact();
     }
 
     private <T> T extractClaim(String token, Key key, Function<Claims, T> claimsResolver)

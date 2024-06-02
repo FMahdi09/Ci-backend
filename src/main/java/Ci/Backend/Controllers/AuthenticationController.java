@@ -18,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping(path = "api/auth")
 public class AuthenticationController
@@ -46,8 +48,12 @@ public class AuthenticationController
                 loginDto.getPassword()
         );
 
-        String accessToken = tokenService.generateAccessToken(authentication.getName());
-        String refreshToken = tokenService.generateRefreshToken(authentication.getName());
+        Date issuedAt = new Date();
+        Date accessExpiration = new Date(issuedAt.getTime() + 70000);
+        Date refreshExpiration = new Date(issuedAt.getTime() + 700000);
+
+        String accessToken = tokenService.generateAccessToken(authentication.getName(), issuedAt, accessExpiration);
+        String refreshToken = tokenService.generateRefreshToken(authentication.getName(), issuedAt, refreshExpiration);
 
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setSecure(true);
@@ -92,7 +98,10 @@ public class AuthenticationController
 
             tokenService.validateRefreshToken(refreshToken, user);
 
-            String accessToken = tokenService.generateAccessToken(user.getUsername());
+            Date issuedAt = new Date();
+            Date refreshExpiration = new Date(issuedAt.getTime() + 700000);
+
+            String accessToken = tokenService.generateAccessToken(user.getUsername(), issuedAt, refreshExpiration);
 
             AuthenticationResponseDto responseDto = new AuthenticationResponseDto(accessToken);
 

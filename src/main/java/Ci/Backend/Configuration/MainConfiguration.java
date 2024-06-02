@@ -11,10 +11,6 @@ public class MainConfiguration implements JwtConfiguration
 
     private String refreshTokenSecret;
 
-    private int accessTokenExpiration;
-
-    private int refreshTokenExpiration;
-
     @Override
     public String getAccessTokenSecret()
     {
@@ -35,27 +31,5 @@ public class MainConfiguration implements JwtConfiguration
     public void setRefreshTokenSecret(String refreshTokenSecret)
     {
         this.refreshTokenSecret = refreshTokenSecret;
-    }
-
-    @Override
-    public int getAccessTokenExpiration()
-    {
-        return accessTokenExpiration;
-    }
-
-    public void setAccessTokenExpiration(int accessTokenExpiration)
-    {
-        this.accessTokenExpiration = accessTokenExpiration;
-    }
-
-    @Override
-    public int getRefreshTokenExpiration()
-    {
-        return refreshTokenExpiration;
-    }
-
-    public void setRefreshTokenExpiration(int refreshTokenExpiration)
-    {
-        this.refreshTokenExpiration = refreshTokenExpiration;
     }
 }
