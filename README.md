@@ -92,6 +92,27 @@ Run the following command in the root directory of the project
 docker compose down
 ```
 
+### Run Tests
+
+#### Run Unit Tests
+
+To run the unit tests execute the following command in the root directory of the project
+
+```
+mvn test -PUnit
+```
+
+#### Run Integration Tests
+
+To run the integration tests execute the following command in the root directory of the project
+
+```
+mvn test -PIntegration
+```
+
+The Integrationtests use test-containers so make sure to have an active docker enviroment available.
+(e.g. Docker Desktop)
+
 ## Build for Production
 
 TODO
