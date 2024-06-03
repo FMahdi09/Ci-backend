@@ -46,6 +46,8 @@ Spring Config:
 * spring.datasource.url: url on which to reach the database
 * spring.datasource.username: db username
 * spring.datasource.password: db password
+* spring.jpa.defer-datasource-initialization=true
+* spring.sql.init.mode=always
 
 Jwt Config:
 
